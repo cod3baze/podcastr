@@ -1,9 +1,7 @@
+import { Header } from "../components/Header";
+
 function Home() {
-  return (
-    <div className="container">
-      <h1>Elias alexandre</h1>
-    </div>
-  );
+  return <h1>index</h1>;
 }
 
 export default Home;
