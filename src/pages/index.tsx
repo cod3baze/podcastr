@@ -1,8 +1,12 @@
 import { GetStaticProps } from "next";
+import Image from "next/Image";
 import { format, parseISO } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
+
 import { api } from "../services/api";
 import { convertDurationToTimeString } from "../utils/convertDurationToTimeString";
+
+import styles from "./home.module.scss";
 
 type IEpisodes = {
   id: string;
@@ -17,15 +21,46 @@ type IEpisodes = {
 };
 
 type IHomeProps = {
-  episodes: IEpisodes[];
+  allEpisodes: IEpisodes[];
+  latestEpisodes: IEpisodes[];
 };
 
-function Home(props: IHomeProps) {
+function Home({ latestEpisodes, allEpisodes }: IHomeProps) {
   return (
-    <>
-      <h1>index</h1>
-      <p>{JSON.stringify(props.episodes)}</p>
-    </>
+    <div className={styles.homePage}>
+      <section className={styles.latestEpisodes}>
+        <h2>Últimos lançamentos</h2>
+
+        <ul>
+          {latestEpisodes.map((episode) => (
+            <li key={episode.id}>
+              <Image
+                width={192}
+                height={192}
+                draggable={false}
+                src={episode.thumbnail}
+                alt={episode.title}
+              />
+
+              <div className={styles.episodeDetails}>
+                <a href="#">{episode.title}</a>
+                <p>{episode.members}</p>
+                <span>{episode.publishedAt}</span>
+                <span>{episode.durationAsString}</span>
+              </div>
+
+              <button type="button">
+                <img
+                  draggable={false}
+                  src={episode.thumbnail}
+                  alt="tocar episódio"
+                />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 }
 
@@ -57,9 +92,13 @@ export const getStaticProps: GetStaticProps = async () => {
     };
   });
 
+  const latestEpisodes = episodes.slice(0, 2);
+  const allEpisodes = episodes.slice(2, episodes.length);
+
   return {
     props: {
-      episodes,
+      allEpisodes,
+      latestEpisodes,
     },
     revalidate: 60 * 60 * 8, // vai refazer a cada 8 horas
   };
